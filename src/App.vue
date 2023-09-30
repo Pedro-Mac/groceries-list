@@ -10,7 +10,10 @@
 
     <ul>
       <li v-for="item in itemsList" :key="item.id">
-        {{ item.name }}
+        <div class="flex">
+          {{ item.name }}
+          <button @click="deleteItem(item.id)">X</button>
+        </div>
       </li>
     </ul>
 
@@ -20,7 +23,7 @@
 
 <script setup lang="ts">
 import { onMounted, ref } from 'vue';
-import { addDoc, collection, getDocs, type DocumentData } from 'firebase/firestore'
+import { addDoc, collection, getDocs, type DocumentData, deleteDoc, doc } from 'firebase/firestore'
 import { db } from './config/firebase'
 
 const item = ref('')
@@ -32,8 +35,6 @@ const getList = () => {
     const list = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }))
     itemsList.value = list
   });
-
-
 }
 
 onMounted(() => {
@@ -57,9 +58,22 @@ async function addItem() {
   } finally {
     isLoading.value = false
   }
-
 }
 
+
+async function deleteItem(id: string) {
+  isLoading.value = true
+  try {
+    await deleteDoc(doc(db, "items", id));
+    getList()
+  } catch (err) {
+    if (err instanceof Error) {
+      console.log(err.message)
+    }
+  } finally {
+    isLoading.value = false
+  }
+}
 </script>
 
 <style scoped>
