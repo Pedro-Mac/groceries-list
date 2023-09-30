@@ -1,6 +1,26 @@
+<template>
+  <main>
+    <form @submit.prevent="addItem">
+      <input type="text" v-model="item" placeholder="Item" :disabled="isLoading" />
+      <div class="flex">
+        <button>Add item</button>
+        <span v-if="isLoading" class="loader"></span>
+      </div>
+    </form>
+
+    <ul>
+      <li v-for="item in itemsList" :key="item.id">
+        {{ item.name }}
+      </li>
+    </ul>
+
+  </main>
+</template>
+
+
 <script setup lang="ts">
 import { onMounted, ref } from 'vue';
-import { addDoc, collection, doc, getDocs, type DocumentData } from 'firebase/firestore'
+import { addDoc, collection, getDocs, type DocumentData } from 'firebase/firestore'
 import { db } from './config/firebase'
 
 const item = ref('')
@@ -9,12 +29,11 @@ const itemsList = ref<DocumentData[]>([])
 
 const getList = () => {
   getDocs(collection(db, "items")).then(querySnapshot => {
-    const a = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }))
-    console.log(a)
-    itemsList.value = a
+    const list = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }))
+    itemsList.value = list
   });
 
-  console.log('during promise')
+
 }
 
 onMounted(() => {
@@ -43,23 +62,31 @@ async function addItem() {
 
 </script>
 
-<template>
-  <main>
-    <form @submit.prevent="addItem">
-      <input type="text" v-model="item" placeholder="Item" :disabled="isLoading" />
-      <button>Add item</button>
-    </form>
+<style scoped>
+.loader {
+  width: 16px;
+  height: 16px;
+  border: 2px solid #000;
+  border-bottom-color: transparent;
+  border-radius: 50%;
+  display: inline-block;
+  box-sizing: border-box;
+  animation: rotation 1s linear infinite;
+}
 
-    <ul v-if="!isLoading">
-      <li v-for="item in itemsList" :key="item.id">
-        {{ item.name }}
-      </li>
-    </ul>
+@keyframes rotation {
+  0% {
+    transform: rotate(0deg);
+  }
 
-  </main>
-</template>
+  100% {
+    transform: rotate(360deg);
+  }
+}
 
-
-
-
-<style scoped></style>
+.flex {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+</style>
