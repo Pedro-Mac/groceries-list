@@ -2,18 +2,18 @@
   <main>
     <form @submit.prevent="addItem">
       <input type="text" v-model="item" placeholder="Item" :disabled="isLoading" />
-      <div class="flex">
+      <div class="submit--btn-container">
         <button>Add item</button>
         <span v-if="isLoading" class="loader"></span>
       </div>
     </form>
 
     <ul>
-      <li v-for="item in itemsList" :key="item.id">
-        <div class="flex">
+      <li v-for="item in itemsList" :key="item.id" class="list--item">
+        <p>
           {{ item.name }}
-          <button @click="deleteItem(item.id)">X</button>
-        </div>
+        </p>
+        <button @click="deleteItem(item.id)">X</button>
       </li>
     </ul>
 
@@ -98,9 +98,16 @@ async function deleteItem(id: string) {
   }
 }
 
-.flex {
+.submit--btn-container {
   display: flex;
   align-items: center;
   gap: 0.5rem;
+}
+
+.list--item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
 }
 </style>
